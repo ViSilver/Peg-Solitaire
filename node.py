@@ -28,13 +28,11 @@ class Node(object):
 
         self.weight = 0
 
-
     def __cmp__(self, other):
         if self.weight < other.weight:
             return self
         else:
             return other
-
 
     def getStatus(self):
         if self.alive:
@@ -46,7 +44,6 @@ class Node(object):
             self.alive = False
         return self.alive
 
-
     def getChildren(self):
         for move in self.availableMoves:
             child = Node(self.table.copy())
@@ -57,7 +54,6 @@ class Node(object):
             child.weight = child.computeWeight()
             self.children.append(child)
         return self.children
-
 
     def computeWeight(self):
         value = 0
