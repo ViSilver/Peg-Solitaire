@@ -88,7 +88,7 @@ class Solver1(object):
             for child in children:
                 if child.table.aliveCells == 1:
                     self.solution.append(child)
-                    print('##################', time.time() - curTime)
+                    print('##################', time.time() - curTime, 'seconds')
                     return
                 elif len(child.availableMoves) > 0:
                     # stack.put_nowait(child)
