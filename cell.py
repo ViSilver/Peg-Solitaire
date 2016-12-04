@@ -15,10 +15,12 @@ class Cell(object):
 	"""docstring for Cell"""
 
 
-	def __init__(self):
+	def __init__(self, cellType):
+		self.setCell(cellType)
 
-		# self.cellType = CellType.EmptyCell
-		self.setCell(CellType.EmptyCell)
+
+	def __repr__(self):
+		return self.cellType
 
 
 	def cell(self):

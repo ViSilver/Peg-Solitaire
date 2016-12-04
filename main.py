@@ -29,7 +29,6 @@ class Solitaire(QMainWindow):
 
 
 	def initUI(self):
-
 		self.sboard = Board(self)
 
 		self.statusbar = self.statusBar()
@@ -58,19 +57,16 @@ class Solitaire(QMainWindow):
 		self.redoButton.setText("Redo")
 		self.redoButton.clicked.connect(self.buttonClicked)
 
-		# self.setCentralWidget(self.sboard)
 		self.show()
 
 
 	def center(self):
-
 		screen = QDesktopWidget().screenGeometry()
 		size = self.geometry()
 		self.move((screen.width()-size.width())/2,
 			(screen.height()-size.height())/2)
 
 	def buttonClicked(self):
-
 		sender = self.sender()
 
 		if sender == self.undoButton:
@@ -81,16 +77,11 @@ class Solitaire(QMainWindow):
 
 
 def main():
-
 	app = QApplication([])
 	solitaire = Solitaire()
 	sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
-
 	main()
-
-
-
 

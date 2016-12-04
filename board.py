@@ -87,8 +87,7 @@ class Board(QFrame):
 		for i in range(Board.BoardHeight):
 			for j in range(Board.BoardWidth):
 				cell = self.cellAt((j, i))
-				self.drawSquare(painter,
-					rect.left() + j * self.squareWidth(),
+				self.drawSquare(painter, rect.left() + j * self.squareWidth(),
 					boardTop + i * self.squareHeight(), cell)
 
 		# Paint event after the mouse event
@@ -97,7 +96,7 @@ class Board(QFrame):
 	def drawSquare(self, painter, x, y, cell):
 		colorTable = [0xEEEEEE, 0x505050, 0xAAAAAA, 0xDADADA, 0x444444]
 
-		color = QColor(colorTable[cell])
+		color = QColor(colorTable[cell.cellType])
 		painter.fillRect(x + 1, y + 1, self.squareWidth() - 2,
 			self.squareHeight() - 2, color)
 
@@ -133,7 +132,7 @@ class Board(QFrame):
 			super(Board, self).timerEvent(event)
 		else:
 			if self.moves.passedX is not None and self.moves.passedY is not None:
-				self.setCellAt((self.moves.passedX, self.moves.passedY), CellType.EmptyCell)
+				self.setCellAt((self.moves.passedX, self.moves.passedY), Cell(CellType.EmptyCell))
 			self.msg2Statusbar.emit(str(self.aliveCells))
 			self.timer.stop()
 			self.update()
@@ -144,7 +143,7 @@ class Board(QFrame):
 		if event.button() == Qt.LeftButton:
 			pos = ((event.pos().x() - 2) // self.squareWidth(), (event.pos().y() - 8) // self.squareHeight())
 
-			if self.cellAt(pos) == CellType.Wall:
+			if self.cellAt(pos).cellType == CellType.Wall:
 				print("Illegal selection of a wall.")
 				return
 
@@ -174,45 +173,67 @@ class Board(QFrame):
 
 
 	def selectCellAt(self, pos):
-		if self.cellAt(pos) == CellType.Wall or self.cellAt(pos) == CellType.EmptyCell:
+		if self.cellAt(pos).cellType == CellType.Wall or self.cellAt(pos).cellType == CellType.EmptyCell:
 			print("Illegal selection.")
 			return False
 
-		elif self.cellAt(pos) == CellType.LivingCell:
+		elif self.cellAt(pos).cellType == CellType.LivingCell:
 			self.moves.curX = pos[0]
 			self.moves.curY = pos[1]
-			self.setCellAt(pos, CellType.SelectedCell)
+			self.setCellAt(pos, Cell(CellType.SelectedCell))
 			self.isSelected = True
 			return True
 
 
 	def deselectCell(self):
 		print("Deselecting", (self.moves.curX, self.moves.curY))
-		self.setCellAt((self.moves.curX, self.moves.curY), CellType.LivingCell)
+		self.setCellAt((self.moves.curX, self.moves.curY), Cell(CellType.LivingCell))
 		self.isSelected = False
 
 
 	def clearBoard(self):
 		self.table = [list(range(self.BoardHeight)) for x in range(self.BoardWidth)]
-		self.table = [list(map(lambda x: CellType.LivingCell, row)) for row in self.table]
-		map(lambda x: print(x), self.table)
+		self.table = [list(map(lambda x: Cell(CellType.LivingCell), row)) for row in self.table]
+		# map(lambda x: print(x), self.table)
 
 
 	def newEmptyCell(self, x, y):
-		self.curSelected = Cell()
-		self.curSelected.setCell(CellType.EmptyCell)
-		self.setCellAt((x, y), self.curSelected.cell())
+		self.curSelected = Cell(CellType.EmptyCell)
+		self.setCellAt((x, y), self.curSelected)
 
 
 	def setWalls(self):
 		for i in range(3):
 			for j in range(3):
 				# Bottom left
-				self.setCellAt((j, i), CellType.Wall)
+				self.setCellAt((j, i), Cell(CellType.Wall))
 				# Top left
-				self.setCellAt((j, -i - 1), CellType.Wall)
+				self.setCellAt((j, -i - 1), Cell(CellType.Wall))
 				# Bottom right
-				self.setCellAt((-j - 1, i), CellType.Wall)
+				self.setCellAt((-j - 1, i), Cell(CellType.Wall))
 				# Top right
-				self.setCellAt((-j - 1, -i - 1), CellType.Wall)
+				self.setCellAt((-j - 1, -i - 1), Cell(CellType.Wall))
 
+
+	def getMoves(self, pos):
+		moves = list()
+
+		# Checking for a move to 'east'
+		if (pos[0] > 1 and self.cellAt((pos[0] - 1, pos[1])).cellType is CellType.LivingCell and
+			self.cellAt((pos[0] - 2, pos[1])).cellType is CellType.EmptyCell):
+			moves.append(Move(pos, (pos[0] - 2, pos[1])))
+		# Checking for a move to 'west'
+		if (pos[0] < self.BoardWidth - 2 and self.cellAt((pos[0] + 1, pos[1])).cellType is CellType.LivingCell and
+			self.cellAt((pos[0] + 2, pos[1])).cellType is CellType.EmptyCell):
+			moves.append(Move(pos, (pos[0] + 2, pos[1])))
+		# Checking for a move to 'north'
+		if (pos[1] > 1 and self.cellAt((pos[0], pos[1] - 1)).cellType is CellType.LivingCell and
+			self.cellAt((pos[0], pos[1] - 2)).cellType is CellType.EmptyCell):
+			moves.append(Move(pos, (pos[0], pos[1] - 2)))
+		# Checking for a move to 'south'
+		if (pos[1] < self.BoardHeight - 2 and self.cellAt((pos[0], pos[1] + 1)).cellType is CellType.LivingCell and
+			self.cellAt((pos[0], pos[1] + 2)).cellType is CellType.EmptyCell):
+			moves.append(Move(pos, (pos[0], pos[1] + 2)))
+
+		map(lambda x: x.getDirection(), moves)
+		return moves
