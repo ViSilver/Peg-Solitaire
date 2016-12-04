@@ -7,7 +7,7 @@ Artificial Intelligence - BIE-ZUM, CVUT
 Course Project
 
 author: Victor Turcanu
-last edited: 04/10/2015
+last edited: 11/06/2015
 """
 
 
@@ -17,6 +17,8 @@ from PyQt5.QtWidgets import (QMainWindow, QDesktopWidget, QApplication,
 from PyQt5.QtCore import ( QRect, QSize)
 
 from board import Board
+from node import Node
+from solver import Solver1, Solver
 
 
 class Solitaire(QMainWindow):
@@ -29,7 +31,6 @@ class Solitaire(QMainWindow):
 
 
 	def initUI(self):
-
 		self.sboard = Board(self)
 
 		self.statusbar = self.statusBar()
@@ -58,39 +59,50 @@ class Solitaire(QMainWindow):
 		self.redoButton.setText("Redo")
 		self.redoButton.clicked.connect(self.buttonClicked)
 
-		# self.setCentralWidget(self.sboard)
+		self.solverButton = QPushButton(self)
+		self.solverButton.setGeometry(QRect(250, 110, 80, 40))
+		self.solverButton.setObjectName("solveButton")
+		self.solverButton.setText("Solve")
+		self.solverButton.clicked.connect(self.buttonClicked)
+
+		self.showSolutionButton = QPushButton(self)
+		self.showSolutionButton.setGeometry(QRect(250, 160, 100, 40))
+		self.showSolutionButton.setObjectName("showSolutionButton")
+		self.showSolutionButton.setText("Show Sol")
+		self.showSolutionButton.clicked.connect(self.buttonClicked)
+
 		self.show()
 
 
 	def center(self):
-
 		screen = QDesktopWidget().screenGeometry()
 		size = self.geometry()
 		self.move((screen.width()-size.width())/2,
 			(screen.height()-size.height())/2)
 
 	def buttonClicked(self):
-
 		sender = self.sender()
 
 		if sender == self.undoButton:
-			self.sboard.moves.undo()
+			self.sboard.table.moves.undo(self.sboard)
 		elif sender == self.redoButton:
-			self.sboard.moves.redo()
+			self.sboard.table.moves.redo(self.sboard)
+		elif sender == self.solverButton:
+			# print(Node(self.sboard.table).availableMoves)
+			self.solver = Solver1(self.sboard.table)
+			self.solver.solve()
+		elif sender == self.showSolutionButton:
+			self.solver.showNext(self.sboard)
 		return
 
 
-def main():
 
+def main():
 	app = QApplication([])
 	solitaire = Solitaire()
 	sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
-
 	main()
-
-
-
 
