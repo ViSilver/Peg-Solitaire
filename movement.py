@@ -18,7 +18,6 @@ class Moves(object):
         self.passedY = None
         self.lastMove = None
 
-
     def tryMove(self, move, board):
         newX = move.toPos[0]
         newY = move.toPos[1]
@@ -26,8 +25,7 @@ class Moves(object):
         self.curY = move.fromPos[1]
 
         if self.table.cellAt(move.toPos).cellType is not CellType.EmptyCell:
-            print(move.toPos, " it's not an empty cell. It is ",
-                  self.table.cellAt(move.toPos).cellType)
+            print(move.toPos, " it's not an empty cell. It is ", self.table.cellAt(move.toPos).cellType)
             return False
         elif abs(self.curX - newX) == 0 and abs(self.curY - newY) != 2:
             print("Distance on y is not 2", move)
@@ -97,7 +95,6 @@ class Moves(object):
             # board.update()
             return True
 
-
     def undo(self, board):
         print("Try to undo to", self.moveId - 1)
         if self.moveId > 0:
@@ -107,7 +104,6 @@ class Moves(object):
             self.makeMoveBack(move.reverse(), board)
             print("Queue(undo): ", self.queueOfMoves)
         return
-
 
     def makeMoveBack(self, move, board):
         print("moving back to movement id ", self.moveId)
@@ -121,35 +117,28 @@ class Moves(object):
         print('Undoing from: ', move.fromPos, ', to: ', move.toPos)
 
         if direct == 'east':
-            self.table.setCellAt((self.curX - 1, self.curY),
-                                 Cell(CellType.LivingCell))
+            self.table.setCellAt((self.curX - 1, self.curY), Cell(CellType.LivingCell))
         elif direct == 'west':
-            self.table.setCellAt((self.curX + 1, self.curY),
-                                 Cell(CellType.LivingCell))
+            self.table.setCellAt((self.curX + 1, self.curY), Cell(CellType.LivingCell))
         elif direct == 'north':
-            self.table.setCellAt((self.curX, self.curY + 1),
-                                 Cell(CellType.LivingCell))
+            self.table.setCellAt((self.curX, self.curY + 1), Cell(CellType.LivingCell))
         elif direct == 'south':
-            self.table.setCellAt((self.curX, self.curY - 1),
-                                 Cell(CellType.LivingCell))
+            self.table.setCellAt((self.curX, self.curY - 1), Cell(CellType.LivingCell))
 
         self.table.aliveCells = self.table.getNrAliveCells()
         board.msg2Statusbar.emit(str(self.table.aliveCells))
         board.update()
         return
 
-
     def redo(self, board):
         print("Try to redo to ", self.moveId + 1)
         if self.moveId < len(self.queueOfMoves):
             self.lastMove = self.queueOfMoves[self.moveId]
             self.moveId += 1
-            self.table.setCellAt(self.lastMove.toPos,
-                                 Cell(CellType.LivingCell))
+            self.table.setCellAt(self.lastMove.toPos, Cell(CellType.LivingCell))
             self.curX = self.lastMove.fromPos[0]
             self.curY = self.lastMove.fromPos[1]
-            self.table.setCellAt(self.lastMove.fromPos,
-                                 Cell(CellType.EmptyCell))
+            self.table.setCellAt(self.lastMove.fromPos, Cell(CellType.EmptyCell))
 
             direct = self.lastMove.getDirection()
             print('Direction for redoing -> ', direct)
@@ -157,27 +146,22 @@ class Moves(object):
 
             if direct == 'east':
                 print("east")
-                self.table.setCellAt((self.curX + 1, self.curY),
-                                     Cell(CellType.EmptyCell))
+                self.table.setCellAt((self.curX + 1, self.curY), Cell(CellType.EmptyCell))
             elif direct == 'west':
                 print("west")
-                self.table.setCellAt((self.curX - 1, self.curY),
-                                     Cell(CellType.EmptyCell))
+                self.table.setCellAt((self.curX - 1, self.curY), Cell(CellType.EmptyCell))
             elif direct == 'south':
                 print('south')
-                self.table.setCellAt((self.curX, self.curY + 1),
-                                     Cell(CellType.EmptyCell))
+                self.table.setCellAt((self.curX, self.curY + 1), Cell(CellType.EmptyCell))
             elif direct == 'north':
                 print('north')
-                self.table.setCellAt((self.curX, self.curY - 1),
-                                     Cell(CellType.EmptyCell))
+                self.table.setCellAt((self.curX, self.curY - 1), Cell(CellType.EmptyCell))
 
             self.table.aliveCells = self.table.getNrAliveCells()
             board.msg2Statusbar.emit(str(self.table.aliveCells))
             board.update()
             # print("Queue(redo): ", self.queueOfMoves)
         return
-
 
     def getAvailableMoves(self):
         avMoves = list()
@@ -187,7 +171,6 @@ class Moves(object):
                     avMoves.extend(self.table.getMoves((x, y)))
         # print(avMoves)
         return avMoves
-
 
     def getCopy(self):
         copy = Moves(self.table)

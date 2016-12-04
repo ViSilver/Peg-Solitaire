@@ -18,7 +18,7 @@ class Cell(object):
         self.setCell(cellType)
 
     def __repr__(self):
-        return self.cellType
+        return str(self.cellType)
 
     def cell(self):
         return self.cellType

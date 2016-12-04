@@ -19,7 +19,6 @@ class Board(QFrame):
         super().__init__(parent)
         self.initBoard()
 
-
     def initBoard(self):
         self.timer = QBasicTimer()
         self.table = Table()
@@ -27,29 +26,17 @@ class Board(QFrame):
         self.isStarted = False
         self.isPaused = False
 
-
     def squareWidth(self):
         return self.contentsRect().width() // Table.TableWidth
-
 
     def squareHeight(self):
         return self.contentsRect().height() // Table.TableHeight
 
-
     def start(self):
         if self.isPaused:
             return
-
-        self.table.isStarted = True
-        self.table.clearBoard()
-
-        self.table.newEmptyCell(4, 4)
-        self.table.setWalls()
-        # self.table.setTestingEnv()
-        self.table.aliveCells = self.table.getNrAliveCells()
         self.msg2Statusbar.emit(str(self.table.aliveCells))
         self.timer.start(Board.Speed, self)
-
 
     def pause(self):
         self.isPaused = not self.isPaused
@@ -62,7 +49,6 @@ class Board(QFrame):
             self.msg2Statusbar.emit(str(self.table.aliveCells))
 
         self.update()
-
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -77,7 +63,6 @@ class Board(QFrame):
                     boardTop + i * self.squareHeight(), cell)
 
         # Paint event after the mouse event
-
 
     def drawSquare(self, painter, x, y, cell):
         colorTable = [0xEEEEEE, 0x505050, 0xAAAAAA, 0xDADADA, 0x444444]
@@ -96,7 +81,6 @@ class Board(QFrame):
         painter.drawLine(x + self.squareWidth() - 1,
             y + self.squareHeight() - 1, x + self.squareWidth() - 1, y + 1)
 
-
     def keyPressEvent(self, event):
         if not self.isStarted:
             super(Board, self).keyPressEvent(event)
@@ -111,7 +95,6 @@ class Board(QFrame):
             return
         else:
             super(Board, self).keyPressEvent(event)
-
 
     def timerEvent(self, event):
         if not event.timerId() == self.timer.timerId():
