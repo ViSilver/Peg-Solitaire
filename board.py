@@ -4,215 +4,156 @@ __author__ = 'Vi'
 from PyQt5.QtGui import (QPainter, QColor)
 from PyQt5.QtWidgets import QFrame
 from PyQt5.QtCore import (Qt, QBasicTimer, pyqtSignal)
+
 from cell import CellType, Cell
 from movement import Move, Moves
+from table import Table
 
 
 class Board(QFrame):
-	"""docstring for Board"""
+    """docstring for Board"""
 
-	msg2Statusbar = pyqtSignal(str)
+    msg2Statusbar = pyqtSignal(str)
+    Speed = 200
 
-	BoardWidth = 9
-	BoardHeight = 9
-	Speed = 200
-
-	def __init__(self, parent):
-		super().__init__(parent)
-		self.initBoard()
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.initBoard()
 
 
-	def initBoard(self):
-		self.timer = QBasicTimer()
-		self.table = list()
-		self.aliveCells = 44
-		self.setFocusPolicy(Qt.StrongFocus)
-		self.isStarted = False
-		self.isPaused = False
-		self.isSelected = False
-		self.clearBoard()
-		self.moves = Moves(self)
+    def initBoard(self):
+        self.timer = QBasicTimer()
+        self.table = Table()
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.isStarted = False
+        self.isPaused = False
 
 
-	def cellAt(self, pos):
-		return self.table[pos[0]][pos[1]]
+    def squareWidth(self):
+        return self.contentsRect().width() // Table.TableWidth
 
 
-	def setCellAt(self, pos, cell):
-		self.table[pos[0]][pos[1]] = cell
+    def squareHeight(self):
+        return self.contentsRect().height() // Table.TableHeight
 
 
-	def squareWidth(self):
-		return self.contentsRect().width() // Board.BoardWidth
+    def start(self):
+        if self.isPaused:
+            return
+
+        self.table.isStarted = True
+        self.table.aliveCells = 45
+        self.table.clearBoard()
+
+        self.msg2Statusbar.emit(str(self.table.aliveCells))
+
+        self.table.newEmptyCell(4, 4)
+        self.table.setWalls()
+        self.timer.start(Board.Speed, self)
 
 
-	def squareHeight(self):
-		return self.contentsRect().height() // Board.BoardHeight
+    def pause(self):
+        self.isPaused = not self.isPaused
+
+        if self.isPaused:
+            self.timer.stop()
+            self.msg2Statusbar.emit("Paused")
+        else:
+            self.timer.start(Board.Speed, self)
+            self.msg2Statusbar.emit(str(self.table.aliveCells))
+
+        self.update()
 
 
-	def start(self):
-		if self.isPaused:
-			return
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        rect = self.contentsRect()
 
-		self.isStarted = True
-		self.aliveCells = 45
-		self.clearBoard()
+        boardTop = rect.bottom() - Table.TableHeight * self.squareHeight()
 
-		self.msg2Statusbar.emit(str(self.aliveCells))
+        for i in range(Table.TableHeight):
+            for j in range(Table.TableWidth):
+                cell = self.table.cellAt((j, i))
+                self.drawSquare(painter, rect.left() + j * self.squareWidth(),
+                    boardTop + i * self.squareHeight(), cell)
 
-		self.newEmptyCell(4, 4)
-		self.setWalls()
-		self.timer.start(Board.Speed, self)
-
-
-	def pause(self):
-		self.isPaused = not self.isPaused
-
-		if self.isPaused:
-			self.timer.stop()
-			self.msg2Statusbar.emit("Paused")
-		else:
-			self.timer.start(Board.Speed, self)
-			self.msg2Statusbar.emit(str(self.aliveCells))
-
-		self.update()
+        # Paint event after the mouse event
 
 
-	def paintEvent(self, event):
-		painter = QPainter(self)
-		rect = self.contentsRect()
+    def drawSquare(self, painter, x, y, cell):
+        colorTable = [0xEEEEEE, 0x505050, 0xAAAAAA, 0xDADADA, 0x444444]
 
-		boardTop = rect.bottom() - Board.BoardHeight * self.squareHeight()
+        color = QColor(colorTable[cell.cellType])
+        painter.fillRect(x + 1, y + 1, self.squareWidth() - 2,
+            self.squareHeight() - 2, color)
 
-		for i in range(Board.BoardHeight):
-			for j in range(Board.BoardWidth):
-				cell = self.cellAt((j, i))
-				self.drawSquare(painter,
-					rect.left() + j * self.squareWidth(),
-					boardTop + i * self.squareHeight(), cell)
+        painter.setPen(color.lighter())
+        painter.drawLine(x, y + self.squareHeight() - 1, x, y)
+        painter.drawLine(x, y, x + self.squareWidth() - 1, y)
 
-		# Paint event after the mouse event
-
-
-	def drawSquare(self, painter, x, y, cell):
-		colorTable = [0xEEEEEE, 0x505050, 0xAAAAAA, 0xDADADA, 0x444444]
-
-		color = QColor(colorTable[cell])
-		painter.fillRect(x + 1, y + 1, self.squareWidth() - 2,
-			self.squareHeight() - 2, color)
-
-		painter.setPen(color.lighter())
-		painter.drawLine(x, y + self.squareHeight() - 1, x, y)
-		painter.drawLine(x, y, x + self.squareWidth() - 1, y)
-
-		painter.setPen(color.darker())
-		painter.drawLine(x + 1, y + self.squareHeight() - 1,
-			x + self.squareWidth() - 1, y + self.squareHeight() - 1)
-		painter.drawLine(x + self.squareWidth() - 1,
-			y + self.squareHeight() - 1, x + self.squareWidth() - 1, y + 1)
+        painter.setPen(color.darker())
+        painter.drawLine(x + 1, y + self.squareHeight() - 1,
+            x + self.squareWidth() - 1, y + self.squareHeight() - 1)
+        painter.drawLine(x + self.squareWidth() - 1,
+            y + self.squareHeight() - 1, x + self.squareWidth() - 1, y + 1)
 
 
-	def keyPressEvent(self, event):
-		if not self.isStarted:
-			super(Board, self).keyPressEvent(event)
+    def keyPressEvent(self, event):
+        if not self.isStarted:
+            super(Board, self).keyPressEvent(event)
 
-		key = event.key()
+        key = event.key()
 
-		if key == Qt.Key_P:
-			self.pause()
-			return
+        if key == Qt.Key_P:
+            self.pause()
+            return
 
-		if self.isPaused:
-			return
-		else:
-			super(Board, self).keyPressEvent(event)
-
-
-	def timerEvent(self, event):
-		if not event.timerId() == self.timer.timerId():
-			super(Board, self).timerEvent(event)
-		else:
-			if self.moves.passedX is not None and self.moves.passedY is not None:
-				self.setCellAt((self.moves.passedX, self.moves.passedY), CellType.EmptyCell)
-			self.msg2Statusbar.emit(str(self.aliveCells))
-			self.timer.stop()
-			self.update()
-			return
+        if self.isPaused:
+            return
+        else:
+            super(Board, self).keyPressEvent(event)
 
 
-	def mousePressEvent(self, event):
-		if event.button() == Qt.LeftButton:
-			pos = ((event.pos().x() - 2) // self.squareWidth(), (event.pos().y() - 8) // self.squareHeight())
-
-			if self.cellAt(pos) == CellType.Wall:
-				print("Illegal selection of a wall.")
-				return
-
-			if self.isSelected:
-				if pos[0] == self.moves.curX and pos[1] == self.moves.curY:
-					print("Trying to select the same cell")
-					self.deselectCell()
-					self.update()
-					return
-
-				self.moves.curMove.setToPos(pos)
-
-				if not self.moves.tryMove(self.moves.curMove):
-					print("Impossible to move")
-					self.deselectCell()
-					self.update()
-					return
-
-			else:
-				self.selectCellAt(pos)
-				self.moves.curMove = Move(pos, None)
-				self.update()
-
-			print(pos)
-		else:
-			super(Board, self).mousePressEvent(event)
+    def timerEvent(self, event):
+        if not event.timerId() == self.timer.timerId():
+            super(Board, self).timerEvent(event)
+        else:
+            if self.table.moves.passedX is not None and self.table.moves.passedY is not None:
+                self.table.setCellAt((self.table.moves.passedX, self.table.moves.passedY), Cell(CellType.EmptyCell))
+            self.msg2Statusbar.emit(str(self.table.aliveCells))
+            self.timer.stop()
+            self.update()
+            return
 
 
-	def selectCellAt(self, pos):
-		if self.cellAt(pos) == CellType.Wall or self.cellAt(pos) == CellType.EmptyCell:
-			print("Illegal selection.")
-			return False
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            pos = ((event.pos().x() - 2) // self.squareWidth(), (event.pos().y() - 8) // self.squareHeight())
 
-		elif self.cellAt(pos) == CellType.LivingCell:
-			self.moves.curX = pos[0]
-			self.moves.curY = pos[1]
-			self.setCellAt(pos, CellType.SelectedCell)
-			self.isSelected = True
-			return True
+            if self.table.cellAt(pos).cellType == CellType.Wall:
+                print("Illegal selection of a wall.")
+                return
 
+            if self.table.isSelected:
+                if pos[0] == self.table.moves.curX and pos[1] == self.table.moves.curY:
+                    print("Trying to select the same cell")
+                    self.table.deselectCell()
+                    return
 
-	def deselectCell(self):
-		print("Deselecting", (self.moves.curX, self.moves.curY))
-		self.setCellAt((self.moves.curX, self.moves.curY), CellType.LivingCell)
-		self.isSelected = False
+                self.table.moves.curMove.setToPos(pos)
 
+                if not self.table.moves.tryMove(self.table.moves.curMove):
+                    print("Impossible to move")
+                    self.table.deselectCell()
+                    return
 
-	def clearBoard(self):
-		self.table = [list(range(self.BoardHeight)) for x in range(self.BoardWidth)]
-		self.table = [list(map(lambda x: CellType.LivingCell, row)) for row in self.table]
-		map(lambda x: print(x), self.table)
+                self.update()
 
+            else:
+                self.table.selectCellAt(pos)
+                self.table.moves.curMove = Move(pos, None)
+                self.update()
 
-	def newEmptyCell(self, x, y):
-		self.curSelected = Cell()
-		self.curSelected.setCell(CellType.EmptyCell)
-		self.setCellAt((x, y), self.curSelected.cell())
-
-
-	def setWalls(self):
-		for i in range(3):
-			for j in range(3):
-				# Bottom left
-				self.setCellAt((j, i), CellType.Wall)
-				# Top left
-				self.setCellAt((j, -i - 1), CellType.Wall)
-				# Bottom right
-				self.setCellAt((-j - 1, i), CellType.Wall)
-				# Top right
-				self.setCellAt((-j - 1, -i - 1), CellType.Wall)
-
+            print(pos)
+        else:
+            super(Board, self).mousePressEvent(event)

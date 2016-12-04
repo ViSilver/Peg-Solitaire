@@ -1,7 +1,7 @@
 __author__ = 'Vi'
 
 
-from board import Move
+# from board import Move
 
 
 l = [1, 2, 3, 4]
