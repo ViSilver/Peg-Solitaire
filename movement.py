@@ -25,8 +25,7 @@ class Moves(object):
         self.curX = move.fromPos[0]
         self.curY = move.fromPos[1]
 
-        if self.table.cellAt(move.toPos).cellType is not CellType.\
-                EmptyCell:
+        if self.table.cellAt(move.toPos).cellType is not CellType.EmptyCell:
             print(move.toPos, " it's not an empty cell. It is ",
                   self.table.cellAt(move.toPos).cellType)
             return False
@@ -51,39 +50,31 @@ class Moves(object):
             # print('Move: -> ', direct)
 
             if direct == 'east':
-                if self.table.cellAt((newX - 1, newY)).cellType is not \
-                        CellType.LivingCell:
+                if self.table.cellAt((newX - 1, newY)).cellType is not CellType.LivingCell:
                     print("Jumping over an empty cell.", move)
                     return False
-                self.table.setCellAt((newX - 1, newY), Cell(CellType.
-                                            PassedCell))
+                self.table.setCellAt((newX - 1, newY), Cell(CellType.PassedCell))
                 self.passedX = newX - 1
                 self.passedY = newY
             elif direct == 'west':
-                if self.table.cellAt((newX + 1, newY)).cellType is not \
-                        CellType.LivingCell:
+                if self.table.cellAt((newX + 1, newY)).cellType is not CellType.LivingCell:
                     print("Jumping over an empty cell.", move)
                     return False
-                self.table.setCellAt((newX + 1, newY), Cell(CellType.
-                                            PassedCell))
+                self.table.setCellAt((newX + 1, newY), Cell(CellType.PassedCell))
                 self.passedX = newX + 1
                 self.passedY = newY
             elif direct == 'north':
-                if self.table.cellAt((newX, newY + 1)).cellType is not \
-                        CellType.LivingCell:
+                if self.table.cellAt((newX, newY + 1)).cellType is not CellType.LivingCell:
                     print("Jumping over an empty cell.")
                     return False
-                self.table.setCellAt((newX, newY + 1), Cell(CellType.
-                                            PassedCell))
+                self.table.setCellAt((newX, newY + 1), Cell(CellType.PassedCell))
                 self.passedX = newX
                 self.passedY = newY + 1
             elif direct == 'south':
-                if self.table.cellAt((newX, newY - 1)).cellType is not \
-                        CellType.LivingCell:
+                if self.table.cellAt((newX, newY - 1)).cellType is not CellType.LivingCell:
                     print("Jumping over an empty cell.")
                     return False
-                self.table.setCellAt((newX, newY - 1), Cell(CellType.
-                                            PassedCell))
+                self.table.setCellAt((newX, newY - 1), Cell(CellType.PassedCell))
                 self.passedX = newX
                 self.passedY = newY - 1
 
@@ -94,8 +85,7 @@ class Moves(object):
             if board is not None:
                 board.timer.start(board.Speed, board)
             else:
-                self.table.setCellAt((self.passedX, self.passedY),
-                                     Cell(CellType.EmptyCell))
+                self.table.setCellAt((self.passedX, self.passedY), Cell(CellType.EmptyCell))
             self.table.setCellAt(move.toPos, Cell(CellType.LivingCell))
             self.lastMove = move
             self.queueOfMoves[self.moveId:] = []
@@ -193,8 +183,7 @@ class Moves(object):
         avMoves = list()
         for x in range(self.table.TableHeight):
             for y in range(self.table.TableWidth):
-                if self.table.cellAt((x, y)).cellType is \
-                        CellType.LivingCell:
+                if self.table.cellAt((x, y)).cellType is CellType.LivingCell:
                     avMoves.extend(self.table.getMoves((x, y)))
         # print(avMoves)
         return avMoves

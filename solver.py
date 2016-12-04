@@ -1,8 +1,14 @@
 __author__ = 'Vi'
+
 # from board import Move
 from node import Node
+
+from queue import Queue, LifoQueue
+from threading import Thread
+from collections import deque
 import time
 import heapq
+
 
 
 class PriorityQueue:
@@ -70,30 +76,32 @@ class Solver1(object):
     def solve(self):
         curTime = time.time()
         index = 0
-        stack = []
+        stack = list()
         # self.root.weight = self.root.computeWeight()
         stack.append(self.root)
         while len(stack) > 0:
             index += 1
             print(index)
             current = stack.pop()
+
+            if current.table.aliveCells == 1:
+                self.solution.append(current)
+                print('##################', time.time() - curTime)
+                return
+
             children = current.getChildren()
+
             for child in children:
-                if child.table.aliveCells == 1:
-                    self.solution.append(child)
-                    print('##################', time.time() - curTime)
-                    return
-                elif len(child.availableMoves) > 0:
+                if len(child.availableMoves) > 0:
                     stack.append(child)
                 # print(child.availableMoves)
                 # time.sleep(5)
 
         if len(self.solution) == 0:
-            print('There are no solution for given configuration.')
+            print('There are no solution for the given configuration.')
         else:
             print('There are ', len(self.solution),
                   ' solutions for given configuration.')
-
 
     def showSolution(self, board):
         example = self.solution[0]

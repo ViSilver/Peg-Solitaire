@@ -4,6 +4,7 @@ __author__ = 'Vi'
 from movement import Move
 from board import Board
 from cell import CellType
+
 import copy
 
 
@@ -30,15 +31,14 @@ class Node(object):
 
     def __cmp__(self, other):
         if self.weight < other.weight:
-            return self
+            return False
         else:
-            return other
+            return True
 
     def getStatus(self):
         if self.alive:
             for child in self.children:
-                if child.availableMoves is not [] and \
-                                child.getStatus() is True:
+                if child.availableMoves is not [] and child.getStatus() is True:
                     self.alive = True
         else:
             self.alive = False
@@ -48,10 +48,9 @@ class Node(object):
         for move in self.availableMoves:
             child = Node(self.table.copy())
             child.table.moves.tryMove(move, None)
-            child.availableMoves = child.table.moves.\
-                getAvailableMoves()
+            child.availableMoves = child.table.moves.getAvailableMoves()
             # print(child.table.getNrAliveCells())
-            child.weight = child.computeWeight()
+            # child.weight = child.computeWeight()
             self.children.append(child)
         return self.children
 
@@ -62,15 +61,14 @@ class Node(object):
 
         for x in range(self.table.TableWidth):
             for y in range(self.table.TableHeight):
-                if self.table.cellAt((x, y)).cellType is \
-                        CellType.LivingCell:
-                    if x <= (self.table.TableWidth - 1)/2:
+                if self.table.cellAt((x, y)).cellType is CellType.LivingCell:
+                    if x <= (self.table.TableWidth - 1) / 2:
                         a = x
                     else:
                         a = self.table.TableWidth - x - 1
-                    if y <= (self.table.TableHeight - 1)/2:
+                    if y <= (self.table.TableHeight - 1) / 2:
                         b = y
                     else:
                         b = self.table.TableHeight - y - 1
                     value += (a * b)
-        return value/(self.table.aliveCells + value)
+        return value / (self.table.aliveCells + value)
