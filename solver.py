@@ -77,29 +77,24 @@ class Solver1(object):
         curTime = time.time()
         index = 0
         stack = list()
-        # self.root.weight = self.root.computeWeight()
         stack.append(self.root)
         while len(stack) > 0:
-            index += 1
-            print(index)
-            # current = stack.get_nowait()
             current = stack.pop()
-            children = current.getChildren()
+            if current.table.aliveCells == 2 and len(current.availableMoves) == 2:
+                self.solution.append(current.async_get_children()[0])
+                break
+            children = current.async_get_children()
             for child in children:
-                if child.table.aliveCells == 1:
-                    self.solution.append(child)
-                    print('##################', time.time() - curTime, 'seconds')
-                    return
-                elif len(child.availableMoves) > 0:
-                    # stack.put_nowait(child)
-                    stack.append(child)
-                # print(child.availableMoves)
-                # time.sleep(5)
-
+                index += 1
+                # print(index)
+                if len(child.availableMoves) > 0:
+                    stack = [child] + stack
         if len(self.solution) == 0:
-            print('There are no solution for the given configuration.')
+            print('##################', time.time() - curTime, 'seconds')
+            print('There are no solution for the given configuration. (' + str(index) + ')')
         else:
-            print('There are ', len(self.solution), ' solutions for given configuration.')
+            print('##################', time.time() - curTime, 'seconds')
+            print('There are ', len(self.solution), ' solutions for given configuration. ' + str(index) + ')')
 
     def showSolution(self, board):
         example = self.solution[0]

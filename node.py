@@ -13,7 +13,7 @@ class Node(object):
     def __init__(self, table):
         self.children = list()
 
-        self.table = copy.deepcopy(table)
+        self.table = table.copy()
         self.table.moves.table = self.table
 
         for x in range(table.TableWidth):
@@ -35,6 +35,9 @@ class Node(object):
         else:
             return True
 
+    def __repr__(self):
+        return '{Node: ' + str(self.availableMoves) + '}'
+
     def getStatus(self):
         if self.alive:
             for child in self.children:
@@ -44,6 +47,7 @@ class Node(object):
             self.alive = False
         return self.alive
 
+    # need to make it asynchronous
     def getChildren(self):
         for move in self.availableMoves:
             child = Node(self.table.copy())
@@ -53,6 +57,36 @@ class Node(object):
             # child.weight = child.computeWeight()
             self.children.append(child)
         return self.children
+
+    def async_get_children(self):
+        number_of_threads = 5
+        division_step = len(self.availableMoves) // number_of_threads
+        if division_step > 1:
+            # print(division_step)
+            from concurrent.futures import ThreadPoolExecutor as Pool
+            pool = Pool(max_workers=number_of_threads)
+
+            chunks = [self.availableMoves[x:x + division_step] for x in range(0, len(self.availableMoves), division_step)]
+
+            for movements in chunks:
+                future = pool.submit(self.helper_method, self.table.copy(), movements)
+                future.add_done_callback(self.append_callback)
+            return self.children
+        else:
+            return self.getChildren()
+
+    @staticmethod
+    def helper_method(table, movements):
+        children = []
+        for movement in movements:
+            child = Node(table)
+            child.table.moves.tryMove(movement, None)
+            child.availableMoves = child.table.moves.getAvailableMoves()
+            children.append(child)
+        return children
+
+    def append_callback(self, future):
+        self.children.extend(future.result())
 
     def computeWeight(self):
         value = 0

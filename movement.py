@@ -1,5 +1,6 @@
 __author__ = 'Vi'
 
+from copy import deepcopy
 
 from cell import CellType, Cell
 # from board import Board
@@ -174,7 +175,7 @@ class Moves(object):
 
     def getCopy(self):
         copy = Moves(self.table)
-        copy.queueOfMoves = self.queueOfMoves
+        copy.queueOfMoves = deepcopy(self.queueOfMoves)
         copy.curMove = self.curMove
         copy.curX = self.curX
         copy.curY = self.curY
@@ -195,7 +196,7 @@ class Move(object):
         self.direction = ''
 
     def __repr__(self):
-        return str((self.fromPos, self.toPos))
+        return '{Movement: [from: ' + str(self.fromPos) + ', to: ' + str(self.toPos) + ']}'
 
     def setToPos(self, toPos):
         self.toPos = toPos
@@ -218,3 +219,8 @@ class Move(object):
         else:
             self.direction = ''
         return self.direction
+
+    def get_copy(self):
+        copy = Move(self.fromPos, self.toPos)
+        copy.getDirection()
+        return copy

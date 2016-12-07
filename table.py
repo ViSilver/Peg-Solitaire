@@ -17,7 +17,7 @@ class Table(object):
         self.clearBoard()
         self.setWalls()
         self.newEmptyCell(4, 4)
-        self.setTestingEnv()
+        # self.setTestingEnv()
         self.aliveCells = self.getNrAliveCells()
         self.moves = Moves(self)
 
@@ -112,7 +112,6 @@ class Table(object):
 
         copy.aliveCells = self.aliveCells
         copy.moves = self.moves.getCopy()
-
         return copy
 
     def setTestingEnv(self):
