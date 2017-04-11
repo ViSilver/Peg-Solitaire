@@ -23,7 +23,6 @@ class PriorityQueue:
     def pop(self):
         return heapq.heappop(self._queue)[-1]
 
-
     def empty(self):
         if self._queue is []:
             return True
@@ -41,14 +40,14 @@ class Solver(object):
         curTime = time.time()
         index = 0
         pQueue = PriorityQueue()
-        self.root.weight = self.root.computeWeight()
+        self.root.weight = self.root.compute_weight()
         pQueue.push(self.root, self.root.weight)
         while not pQueue.empty():
             index += 1
             print(index)
             current = pQueue.pop()
             print(current.weight)
-            children = current.getChildren()
+            children = current.get_children()
             for child in children:
                 if child.table.aliveCells == 1:
                     self.solution.append(child)
@@ -96,19 +95,18 @@ class Solver1(object):
             print('##################', time.time() - curTime, 'seconds')
             print('There are ', len(self.solution), ' solutions for given configuration. ' + str(index) + ')')
 
-    def showSolution(self, board):
+    def show_solution(self, board):
         example = self.solution[0]
         for move in example.table.moves.queueOfMoves:
             time.sleep(1)
-            board.table.moves.tryMove(move, None)
+            board.table.moves.try_move(move, None)
             board.update()
             # time.sleep(1)
             board.timer.start(board.Speed, board)
 
-
-    def showNext(self, board):
+    def show_next(self, board):
         move = self.solution[0].table.moves.queueOfMoves[self.moveId]
-        board.table.moves.tryMove(move, None)
+        board.table.moves.try_move(move, None)
         board.update()
         self.moveId += 1
 

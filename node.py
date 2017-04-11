@@ -20,7 +20,7 @@ class Node(object):
             for y in range(table.TableWidth):
                 self.table.grid[x][y] = table.grid[x][y]
 
-        self.availableMoves = self.table.moves.getAvailableMoves()
+        self.availableMoves = self.table.moves.get_available_moves()
 
         if self.availableMoves is []:
             self.alive = False
@@ -38,23 +38,23 @@ class Node(object):
     def __repr__(self):
         return '{Node: ' + str(self.availableMoves) + '}'
 
-    def getStatus(self):
+    def get_status(self):
         if self.alive:
             for child in self.children:
-                if child.availableMoves is not [] and child.getStatus() is True:
+                if child.availableMoves is not [] and child.get_status() is True:
                     self.alive = True
         else:
             self.alive = False
         return self.alive
 
     # need to make it asynchronous
-    def getChildren(self):
+    def get_children(self):
         for move in self.availableMoves:
             child = Node(self.table.copy())
-            child.table.moves.tryMove(move, None)
-            child.availableMoves = child.table.moves.getAvailableMoves()
-            # print(child.table.getNrAliveCells())
-            # child.weight = child.computeWeight()
+            child.table.moves.try_move(move, None)
+            child.availableMoves = child.table.moves.get_available_moves()
+            # print(child.table.get_nr_alive_cells())
+            # child.weight = child.compute_weight()
             self.children.append(child)
         return self.children
 
@@ -73,29 +73,29 @@ class Node(object):
                 future.add_done_callback(self.append_callback)
             return self.children
         else:
-            return self.getChildren()
+            return self.get_children()
 
     @staticmethod
     def helper_method(table, movements):
         children = []
         for movement in movements:
             child = Node(table)
-            child.table.moves.tryMove(movement, None)
-            child.availableMoves = child.table.moves.getAvailableMoves()
+            child.table.moves.try_move(movement, None)
+            child.availableMoves = child.table.moves.get_available_moves()
             children.append(child)
         return children
 
     def append_callback(self, future):
         self.children.extend(future.result())
 
-    def computeWeight(self):
+    def compute_weight(self):
         value = 0
         a = 0
         b = 0
 
         for x in range(self.table.TableWidth):
             for y in range(self.table.TableHeight):
-                if self.table.cellAt((x, y)).cellType is CellType.LivingCell:
+                if self.table.cell_at((x, y)).cell_type is CellType.LivingCell:
                     if x <= (self.table.TableWidth - 1) / 2:
                         a = x
                     else:

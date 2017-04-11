@@ -17,19 +17,19 @@ class Board(QFrame):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.initBoard()
+        self.init_board()
 
-    def initBoard(self):
+    def init_board(self):
         self.timer = QBasicTimer()
         self.table = Table()
         self.setFocusPolicy(Qt.StrongFocus)
         self.isStarted = False
         self.isPaused = False
 
-    def squareWidth(self):
+    def square_width(self):
         return self.contentsRect().width() // Table.TableWidth
 
-    def squareHeight(self):
+    def square_height(self):
         return self.contentsRect().height() // Table.TableHeight
 
     def start(self):
@@ -54,32 +54,32 @@ class Board(QFrame):
         painter = QPainter(self)
         rect = self.contentsRect()
 
-        boardTop = rect.bottom() - Table.TableHeight * self.squareHeight()
+        boardTop = rect.bottom() - Table.TableHeight * self.square_height()
 
         for i in range(Table.TableHeight):
             for j in range(Table.TableWidth):
-                cell = self.table.cellAt((j, i))
-                self.drawSquare(painter, rect.left() + j * self.squareWidth(),
-                    boardTop + i * self.squareHeight(), cell)
+                cell = self.table.cell_at((j, i))
+                self.draw_square(painter, rect.left() + j * self.square_width(),
+                                 boardTop + i * self.square_height(), cell)
 
         # Paint event after the mouse event
 
-    def drawSquare(self, painter, x, y, cell):
+    def draw_square(self, painter, x, y, cell):
         colorTable = [0xEEEEEE, 0x505050, 0xAAAAAA, 0xDADADA, 0x444444]
 
-        color = QColor(colorTable[cell.cellType])
-        painter.fillRect(x + 1, y + 1, self.squareWidth() - 2,
-            self.squareHeight() - 2, color)
+        color = QColor(colorTable[cell.cell_type])
+        painter.fillRect(x + 1, y + 1, self.square_width() - 2,
+                         self.square_height() - 2, color)
 
         painter.setPen(color.lighter())
-        painter.drawLine(x, y + self.squareHeight() - 1, x, y)
-        painter.drawLine(x, y, x + self.squareWidth() - 1, y)
+        painter.drawLine(x, y + self.square_height() - 1, x, y)
+        painter.drawLine(x, y, x + self.square_width() - 1, y)
 
         painter.setPen(color.darker())
-        painter.drawLine(x + 1, y + self.squareHeight() - 1,
-            x + self.squareWidth() - 1, y + self.squareHeight() - 1)
-        painter.drawLine(x + self.squareWidth() - 1,
-            y + self.squareHeight() - 1, x + self.squareWidth() - 1, y + 1)
+        painter.drawLine(x + 1, y + self.square_height() - 1,
+                         x + self.square_width() - 1, y + self.square_height() - 1)
+        painter.drawLine(x + self.square_width() - 1,
+                         y + self.square_height() - 1, x + self.square_width() - 1, y + 1)
 
     def keyPressEvent(self, event):
         if not self.isStarted:
@@ -101,7 +101,7 @@ class Board(QFrame):
             super(Board, self).timerEvent(event)
         else:
             if self.table.moves.passedX is not None and self.table.moves.passedY is not None:
-                self.table.setCellAt((self.table.moves.passedX, self.table.moves.passedY), Cell(CellType.EmptyCell))
+                self.table.set_cell_at((self.table.moves.passedX, self.table.moves.passedY), Cell(CellType.EmptyCell))
             self.msg2Statusbar.emit(str(self.table.aliveCells))
             self.timer.stop()
             self.update()
@@ -109,24 +109,24 @@ class Board(QFrame):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            pos = ((event.pos().x() - 2) // self.squareWidth(), (event.pos().y() - 8) // self.squareHeight())
+            pos = ((event.pos().x() - 2) // self.square_width(), (event.pos().y() - 8) // self.square_height())
 
-            if self.table.cellAt(pos).cellType == CellType.Wall:
+            if self.table.cell_at(pos).cell_type == CellType.Wall:
                 print("Illegal selection of a wall.")
                 return
 
             if self.table.isSelected:
                 if pos[0] == self.table.moves.curX and pos[1] == self.table.moves.curY:
                     print("Trying to select the same cell")
-                    self.table.deselectCell()
+                    self.table.deselect_cell()
                     self.update()
                     return
 
-                self.table.moves.curMove.setToPos(pos)
+                self.table.moves.curMove.set_to_pos(pos)
 
-                if not self.table.moves.tryMove(self.table.moves.curMove, self):
+                if not self.table.moves.try_move(self.table.moves.curMove, self):
                     # print("Impossible to move")
-                    self.table.deselectCell()
+                    self.table.deselect_cell()
                     self.update()
                     return
 
@@ -134,7 +134,7 @@ class Board(QFrame):
                 self.update()
 
             else:
-                self.table.selectCellAt(pos)
+                self.table.select_cell_at(pos)
                 self.table.moves.curMove = Move(pos, None)
                 self.update()
 

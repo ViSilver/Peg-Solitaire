@@ -19,14 +19,14 @@ class Moves(object):
         self.passedY = None
         self.lastMove = None
 
-    def tryMove(self, move, board):
+    def try_move(self, move, board):
         newX = move.toPos[0]
         newY = move.toPos[1]
         self.curX = move.fromPos[0]
         self.curY = move.fromPos[1]
 
-        if self.table.cellAt(move.toPos).cellType is not CellType.EmptyCell:
-            print(move.toPos, " it's not an empty cell. It is ", self.table.cellAt(move.toPos).cellType)
+        if self.table.cell_at(move.toPos).cell_type is not CellType.EmptyCell:
+            print(move.toPos, " it's not an empty cell. It is ", self.table.cell_at(move.toPos).cell_type)
             return False
         elif abs(self.curX - newX) == 0 and abs(self.curY - newY) != 2:
             print("Distance on y is not 2", move)
@@ -43,54 +43,54 @@ class Moves(object):
             return False
         else:
             # print(move.toPos)
-            direct = move.getDirection()
+            direct = move.get_direction()
             if direct == '':
                 return False
             # print('Move: -> ', direct)
 
             if direct == 'east':
-                if self.table.cellAt((newX - 1, newY)).cellType is not CellType.LivingCell:
+                if self.table.cell_at((newX - 1, newY)).cell_type is not CellType.LivingCell:
                     print("Jumping over an empty cell.", move)
                     return False
-                self.table.setCellAt((newX - 1, newY), Cell(CellType.PassedCell))
+                self.table.set_cell_at((newX - 1, newY), Cell(CellType.PassedCell))
                 self.passedX = newX - 1
                 self.passedY = newY
             elif direct == 'west':
-                if self.table.cellAt((newX + 1, newY)).cellType is not CellType.LivingCell:
+                if self.table.cell_at((newX + 1, newY)).cell_type is not CellType.LivingCell:
                     print("Jumping over an empty cell.", move)
                     return False
-                self.table.setCellAt((newX + 1, newY), Cell(CellType.PassedCell))
+                self.table.set_cell_at((newX + 1, newY), Cell(CellType.PassedCell))
                 self.passedX = newX + 1
                 self.passedY = newY
             elif direct == 'north':
-                if self.table.cellAt((newX, newY + 1)).cellType is not CellType.LivingCell:
+                if self.table.cell_at((newX, newY + 1)).cell_type is not CellType.LivingCell:
                     print("Jumping over an empty cell.")
                     return False
-                self.table.setCellAt((newX, newY + 1), Cell(CellType.PassedCell))
+                self.table.set_cell_at((newX, newY + 1), Cell(CellType.PassedCell))
                 self.passedX = newX
                 self.passedY = newY + 1
             elif direct == 'south':
-                if self.table.cellAt((newX, newY - 1)).cellType is not CellType.LivingCell:
+                if self.table.cell_at((newX, newY - 1)).cell_type is not CellType.LivingCell:
                     print("Jumping over an empty cell.")
                     return False
-                self.table.setCellAt((newX, newY - 1), Cell(CellType.PassedCell))
+                self.table.set_cell_at((newX, newY - 1), Cell(CellType.PassedCell))
                 self.passedX = newX
                 self.passedY = newY - 1
 
-            self.table.deselectCell()
-            self.table.setCellAt(move.fromPos, Cell(CellType.EmptyCell))
+            self.table.deselect_cell()
+            self.table.set_cell_at(move.fromPos, Cell(CellType.EmptyCell))
             self.table.aliveCells -= 1
             # board.update()
             if board is not None:
                 board.timer.start(board.Speed, board)
             else:
-                self.table.setCellAt((self.passedX, self.passedY), Cell(CellType.EmptyCell))
-            self.table.setCellAt(move.toPos, Cell(CellType.LivingCell))
+                self.table.set_cell_at((self.passedX, self.passedY), Cell(CellType.EmptyCell))
+            self.table.set_cell_at(move.toPos, Cell(CellType.LivingCell))
             self.lastMove = move
             self.queueOfMoves[self.moveId:] = []
             self.moveId += 1
             self.queueOfMoves.append(move)
-            # print("Queue (inside tryMove[]): ", len(self.queueOfMoves),
+            # print("Queue (inside try_move[]): ", len(self.queueOfMoves),
             # 			self.queueOfMoves)
             # print(self.table.aliveCells)
             # board.update()
@@ -102,31 +102,31 @@ class Moves(object):
             self.moveId -= 1
             self.lastMove = self.queueOfMoves[self.moveId - 1]
             move = self.queueOfMoves[self.moveId]
-            self.makeMoveBack(move.reverse(), board)
+            self.make_move_back(move.reverse(), board)
             print("Queue(undo): ", self.queueOfMoves)
         return
 
-    def makeMoveBack(self, move, board):
+    def make_move_back(self, move, board):
         print("moving back to movement id ", self.moveId)
         self.curX = move.toPos[0]
         self.curY = move.toPos[1]
-        self.table.setCellAt(move.toPos, Cell(CellType.LivingCell))
-        self.table.setCellAt(move.fromPos, Cell(CellType.EmptyCell))
+        self.table.set_cell_at(move.toPos, Cell(CellType.LivingCell))
+        self.table.set_cell_at(move.fromPos, Cell(CellType.EmptyCell))
 
-        direct = move.getDirection()
+        direct = move.get_direction()
         print('Direction for undoing ->', direct)
         print('Undoing from: ', move.fromPos, ', to: ', move.toPos)
 
         if direct == 'east':
-            self.table.setCellAt((self.curX - 1, self.curY), Cell(CellType.LivingCell))
+            self.table.set_cell_at((self.curX - 1, self.curY), Cell(CellType.LivingCell))
         elif direct == 'west':
-            self.table.setCellAt((self.curX + 1, self.curY), Cell(CellType.LivingCell))
+            self.table.set_cell_at((self.curX + 1, self.curY), Cell(CellType.LivingCell))
         elif direct == 'north':
-            self.table.setCellAt((self.curX, self.curY + 1), Cell(CellType.LivingCell))
+            self.table.set_cell_at((self.curX, self.curY + 1), Cell(CellType.LivingCell))
         elif direct == 'south':
-            self.table.setCellAt((self.curX, self.curY - 1), Cell(CellType.LivingCell))
+            self.table.set_cell_at((self.curX, self.curY - 1), Cell(CellType.LivingCell))
 
-        self.table.aliveCells = self.table.getNrAliveCells()
+        self.table.aliveCells = self.table.get_nr_alive_cells()
         board.msg2Statusbar.emit(str(self.table.aliveCells))
         board.update()
         return
@@ -136,44 +136,44 @@ class Moves(object):
         if self.moveId < len(self.queueOfMoves):
             self.lastMove = self.queueOfMoves[self.moveId]
             self.moveId += 1
-            self.table.setCellAt(self.lastMove.toPos, Cell(CellType.LivingCell))
+            self.table.set_cell_at(self.lastMove.toPos, Cell(CellType.LivingCell))
             self.curX = self.lastMove.fromPos[0]
             self.curY = self.lastMove.fromPos[1]
-            self.table.setCellAt(self.lastMove.fromPos, Cell(CellType.EmptyCell))
+            self.table.set_cell_at(self.lastMove.fromPos, Cell(CellType.EmptyCell))
 
-            direct = self.lastMove.getDirection()
+            direct = self.lastMove.get_direction()
             print('Direction for redoing -> ', direct)
             # print('Redoing from: ', self.lastMove.fromPos, ', to: ', self.lastMove.toPos)
 
             if direct == 'east':
                 print("east")
-                self.table.setCellAt((self.curX + 1, self.curY), Cell(CellType.EmptyCell))
+                self.table.set_cell_at((self.curX + 1, self.curY), Cell(CellType.EmptyCell))
             elif direct == 'west':
                 print("west")
-                self.table.setCellAt((self.curX - 1, self.curY), Cell(CellType.EmptyCell))
+                self.table.set_cell_at((self.curX - 1, self.curY), Cell(CellType.EmptyCell))
             elif direct == 'south':
                 print('south')
-                self.table.setCellAt((self.curX, self.curY + 1), Cell(CellType.EmptyCell))
+                self.table.set_cell_at((self.curX, self.curY + 1), Cell(CellType.EmptyCell))
             elif direct == 'north':
                 print('north')
-                self.table.setCellAt((self.curX, self.curY - 1), Cell(CellType.EmptyCell))
+                self.table.set_cell_at((self.curX, self.curY - 1), Cell(CellType.EmptyCell))
 
-            self.table.aliveCells = self.table.getNrAliveCells()
+            self.table.aliveCells = self.table.get_nr_alive_cells()
             board.msg2Statusbar.emit(str(self.table.aliveCells))
             board.update()
             # print("Queue(redo): ", self.queueOfMoves)
         return
 
-    def getAvailableMoves(self):
-        avMoves = list()
+    def get_available_moves(self):
+        av_moves = list()
         for x in range(self.table.TableHeight):
             for y in range(self.table.TableWidth):
-                if self.table.cellAt((x, y)).cellType is CellType.LivingCell:
-                    avMoves.extend(self.table.getMoves((x, y)))
-        # print(avMoves)
-        return avMoves
+                if self.table.cell_at((x, y)).cell_type is CellType.LivingCell:
+                    av_moves.extend(self.table.getMoves((x, y)))
+        # print(av_moves)
+        return av_moves
 
-    def getCopy(self):
+    def get_copy(self):
         copy = Moves(self.table)
         copy.queueOfMoves = deepcopy(self.queueOfMoves)
         copy.curMove = self.curMove
@@ -198,14 +198,13 @@ class Move(object):
     def __repr__(self):
         return '{Movement: [from: ' + str(self.fromPos) + ', to: ' + str(self.toPos) + ']}'
 
-    def setToPos(self, toPos):
+    def set_to_pos(self, toPos):
         self.toPos = toPos
 
     def reverse(self):
-        newMove = Move(self.toPos, self.fromPos)
-        return newMove
+        return Move(self.toPos, self.fromPos)
 
-    def getDirection(self):
+    def get_direction(self):
         if self.toPos[0] == self.fromPos[0]:
             if self.toPos[1] > self.fromPos[1]:
                 self.direction = 'south'
@@ -222,5 +221,5 @@ class Move(object):
 
     def get_copy(self):
         copy = Move(self.fromPos, self.toPos)
-        copy.getDirection()
+        copy.get_direction()
         return copy

@@ -92,7 +92,7 @@ class Solitaire(QMainWindow):
             self.solver = Solver1(self.sboard.table)
             self.solver.solve()
         elif sender == self.showSolutionButton:
-            self.solver.showNext(self.sboard)
+            self.solver.show_next(self.sboard)
         return
 
 

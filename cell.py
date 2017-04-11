@@ -14,14 +14,11 @@ class CellType(object):
 class Cell(object):
     """docstring for Cell"""
 
-    def __init__(self, cellType):
-        self.setCell(cellType)
+    def __init__(self, cell_type):
+        self.cell_type = cell_type
 
     def __repr__(self):
-        return str(self.cellType)
+        return str(self.cell_type)
 
     def cell(self):
-        return self.cellType
-
-    def setCell(self, cell):
-        self.cellType = cell
+        return self.cell_type
