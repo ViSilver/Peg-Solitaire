@@ -12,13 +12,11 @@ last edited: 11/06/2015
 
 
 import sys
-from PyQt5.QtWidgets import (QMainWindow, QDesktopWidget, QApplication,
-    QPushButton)
-from PyQt5.QtCore import ( QRect, QSize)
+from PyQt5.QtWidgets import (QMainWindow, QDesktopWidget, QApplication, QPushButton)
+from PyQt5.QtCore import (QRect, QSize)
 
 from board import Board
-from node import Node
-from solver import Solver1, Solver
+from solver import Solver1
 
 
 class Solitaire(QMainWindow):
@@ -26,11 +24,9 @@ class Solitaire(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.init_u_i()
 
-        self.initUI()
-
-
-    def initUI(self):
+    def init_u_i(self):
         self.sboard = Board(self)
 
         self.statusbar = self.statusBar()
@@ -73,12 +69,10 @@ class Solitaire(QMainWindow):
 
         self.show()
 
-
     def center(self):
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
-        self.move((screen.width()-size.width())/2,
-            (screen.height()-size.height())/2)
+        self.move((screen.width() - size.width())/2, (screen.height() - size.height())/2)
 
     def buttonClicked(self):
         sender = self.sender()
@@ -94,7 +88,6 @@ class Solitaire(QMainWindow):
         elif sender == self.showSolutionButton:
             self.solver.show_next(self.sboard)
         return
-
 
 
 def main():

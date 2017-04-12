@@ -1,7 +1,3 @@
-__author__ = 'Vi'
-
-import pprint
-
 from movement import Move, Moves
 from cell import Cell, CellType
 
@@ -69,27 +65,31 @@ class Table(object):
             self.set_cell_at((i, 0), Cell(CellType.Wall))
             self.set_cell_at((i, self.TableHeight - 1), Cell(CellType.Wall))
 
-    def getMoves(self, pos):
+    def get_moves(self, pos):
         moves = list()
 
         # Checking for a move to 'east'
-        if (pos[0] > 1 and self.cell_at((pos[0] - 1, pos[1])).cell_type is CellType.LivingCell
-                    and self.cell_at((pos[0] - 2, pos[1])).cell_type is CellType.EmptyCell):
+        if (pos[0] > 1
+                and self.cell_at((pos[0] - 1, pos[1])).cell_type is CellType.LivingCell
+                and self.cell_at((pos[0] - 2, pos[1])).cell_type is CellType.EmptyCell):
             moves.append(Move(pos, (pos[0] - 2, pos[1])))
 
         # Checking for a move to 'west'
-        if (pos[0] < self.TableWidth - 2 and self.cell_at((pos[0] + 1, pos[1])).cell_type is CellType.LivingCell
-                    and self.cell_at((pos[0] + 2, pos[1])).cell_type is CellType.EmptyCell):
+        if (pos[0] < self.TableWidth - 2
+                and self.cell_at((pos[0] + 1, pos[1])).cell_type is CellType.LivingCell
+                and self.cell_at((pos[0] + 2, pos[1])).cell_type is CellType.EmptyCell):
             moves.append(Move(pos, (pos[0] + 2, pos[1])))
 
         # Checking for a move to 'north'
-        if (pos[1] > 1 and self.cell_at((pos[0], pos[1] - 1)).cell_type is CellType.LivingCell
-                    and self.cell_at((pos[0], pos[1] - 2)).cell_type is CellType.EmptyCell):
+        if (pos[1] > 1
+                and self.cell_at((pos[0], pos[1] - 1)).cell_type is CellType.LivingCell
+                and self.cell_at((pos[0], pos[1] - 2)).cell_type is CellType.EmptyCell):
             moves.append(Move(pos, (pos[0], pos[1] - 2)))
 
         # Checking for a move to 'south'
-        if (pos[1] < self.TableHeight - 2 and self.cell_at((pos[0], pos[1] + 1)).cell_type is CellType.LivingCell
-            and self.cell_at((pos[0], pos[1] + 2)).cell_type is CellType.EmptyCell):
+        if (pos[1] < self.TableHeight - 2
+                and self.cell_at((pos[0], pos[1] + 1)).cell_type is CellType.LivingCell
+                and self.cell_at((pos[0], pos[1] + 2)).cell_type is CellType.EmptyCell):
             moves.append(Move(pos, (pos[0], pos[1] + 2)))
 
         map(lambda x: x.get_direction(), moves)

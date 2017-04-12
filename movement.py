@@ -1,9 +1,8 @@
-__author__ = 'Vi'
-
 from copy import deepcopy
 
 from cell import CellType, Cell
 # from board import Board
+
 
 class Moves(object):
     """docstring for Moves"""
@@ -20,26 +19,26 @@ class Moves(object):
         self.lastMove = None
 
     def try_move(self, move, board):
-        newX = move.toPos[0]
-        newY = move.toPos[1]
+        new_x = move.toPos[0]
+        new_y = move.toPos[1]
         self.curX = move.fromPos[0]
         self.curY = move.fromPos[1]
 
         if self.table.cell_at(move.toPos).cell_type is not CellType.EmptyCell:
             print(move.toPos, " it's not an empty cell. It is ", self.table.cell_at(move.toPos).cell_type)
             return False
-        elif abs(self.curX - newX) == 0 and abs(self.curY - newY) != 2:
+        elif abs(self.curX - new_x) == 0 and abs(self.curY - new_y) != 2:
             print("Distance on y is not 2", move)
             return False
-        elif abs(self.curX - newX) != 2 and abs(self.curY - newY) == 0:
+        elif abs(self.curX - new_x) != 2 and abs(self.curY - new_y) == 0:
             print("Distance on x is not 2", move)
             return False
-        elif abs(self.curX - newX) != 2 and abs(self.curY - newY) != 2:
+        elif abs(self.curX - new_x) != 2 and abs(self.curY - new_y) != 2:
             print("Moving on diagonal", move)
             return False
-        elif (newX > 5 or newX < 3) and (newY > 5 or newY < 3):
+        elif (new_x > 5 or new_x < 3) and (new_y > 5 or new_y < 3):
             return False
-        elif (newX > 8 or newX < 0) and (newY > 8 or newY < 0):
+        elif (new_x > 8 or new_x < 0) and (new_y > 8 or new_y < 0):
             return False
         else:
             # print(move.toPos)
@@ -49,33 +48,33 @@ class Moves(object):
             # print('Move: -> ', direct)
 
             if direct == 'east':
-                if self.table.cell_at((newX - 1, newY)).cell_type is not CellType.LivingCell:
+                if self.table.cell_at((new_x - 1, new_y)).cell_type is not CellType.LivingCell:
                     print("Jumping over an empty cell.", move)
                     return False
-                self.table.set_cell_at((newX - 1, newY), Cell(CellType.PassedCell))
-                self.passedX = newX - 1
-                self.passedY = newY
+                self.table.set_cell_at((new_x - 1, new_y), Cell(CellType.PassedCell))
+                self.passedX = new_x - 1
+                self.passedY = new_y
             elif direct == 'west':
-                if self.table.cell_at((newX + 1, newY)).cell_type is not CellType.LivingCell:
+                if self.table.cell_at((new_x + 1, new_y)).cell_type is not CellType.LivingCell:
                     print("Jumping over an empty cell.", move)
                     return False
-                self.table.set_cell_at((newX + 1, newY), Cell(CellType.PassedCell))
-                self.passedX = newX + 1
-                self.passedY = newY
+                self.table.set_cell_at((new_x + 1, new_y), Cell(CellType.PassedCell))
+                self.passedX = new_x + 1
+                self.passedY = new_y
             elif direct == 'north':
-                if self.table.cell_at((newX, newY + 1)).cell_type is not CellType.LivingCell:
+                if self.table.cell_at((new_x, new_y + 1)).cell_type is not CellType.LivingCell:
                     print("Jumping over an empty cell.")
                     return False
-                self.table.set_cell_at((newX, newY + 1), Cell(CellType.PassedCell))
-                self.passedX = newX
-                self.passedY = newY + 1
+                self.table.set_cell_at((new_x, new_y + 1), Cell(CellType.PassedCell))
+                self.passedX = new_x
+                self.passedY = new_y + 1
             elif direct == 'south':
-                if self.table.cell_at((newX, newY - 1)).cell_type is not CellType.LivingCell:
+                if self.table.cell_at((new_x, new_y - 1)).cell_type is not CellType.LivingCell:
                     print("Jumping over an empty cell.")
                     return False
-                self.table.set_cell_at((newX, newY - 1), Cell(CellType.PassedCell))
-                self.passedX = newX
-                self.passedY = newY - 1
+                self.table.set_cell_at((new_x, new_y - 1), Cell(CellType.PassedCell))
+                self.passedX = new_x
+                self.passedY = new_y - 1
 
             self.table.deselect_cell()
             self.table.set_cell_at(move.fromPos, Cell(CellType.EmptyCell))
@@ -169,7 +168,7 @@ class Moves(object):
         for x in range(self.table.TableHeight):
             for y in range(self.table.TableWidth):
                 if self.table.cell_at((x, y)).cell_type is CellType.LivingCell:
-                    av_moves.extend(self.table.getMoves((x, y)))
+                    av_moves.extend(self.table.get_moves((x, y)))
         # print(av_moves)
         return av_moves
 
